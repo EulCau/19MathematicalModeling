@@ -3,6 +3,7 @@ bin/
 libs/
 .vscode
 Tmp/
+.idea
 
 Thumbs.db
 
