@@ -17,12 +17,16 @@ function rpca_denoise()
               'Callback', @(src, event) load_image(src, event, handles));
     
     uicontrol('Style', 'pushbutton', 'String', 'RPCA with each color', ...
-              'Position', [200, 350, 100, 30], ...
+              'Position', [200, 350, 200, 30], ...
               'Callback', @(src, event) run_rpca_1(src, event, handles));
     
     uicontrol('Style', 'pushbutton', 'String', 'Save Result', ...
-              'Position', [350, 350, 100, 30], ...
+              'Position', [450, 350, 100, 30], ...
               'Callback', @(src, event) save_result(src, event, handles));
+    
+    uicontrol('Style', 'pushbutton', 'String', 'Save Noise', ...
+              'Position', [600, 350, 100, 30], ...
+              'Callback', @(src, event) save_noise(src, event, handles));
 end
 
 function load_image(~, ~, handles)
@@ -48,7 +52,7 @@ function run_rpca_1(~, ~, handles)
     handles.S = zeros(size(handles.img));
     
     for i = 1:c
-        [handles.L(:,:,i), handles.S(:,:,i)] = rpca(handles.img(:,:,i), lambda);
+        [handles.L(:,:,i), handles.S(:,:,i)] = rpca(handles.img(:,:,i), 10 * lambda);
     end
     
     imshow(handles.L, 'Parent', handles.ax2);
@@ -98,6 +102,18 @@ function save_result(~, ~, handles)
     [file, path] = uiputfile({'*.png', 'PNG Image'; '*.jpg', 'JPEG Image'});
     if file
         imwrite(handles.L, fullfile(path, file));
+    end
+end
+
+function save_noise(~, ~, handles)
+    handles = guidata(handles.ax1);
+    if isempty(handles.S)
+        errordlg('No result to save!', 'Error');
+        return;
+    end
+    [file, path] = uiputfile({'*.png', 'PNG Image'; '*.jpg', 'JPEG Image'});
+    if file
+        imwrite(handles.S, fullfile(path, file));
     end
 end
 
