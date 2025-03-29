@@ -18,7 +18,7 @@ function rpca_denoise()
     
     uicontrol('Style', 'pushbutton', 'String', 'RPCA with each color', ...
               'Position', [200, 350, 200, 30], ...
-              'Callback', @(src, event) run_rpca_1(src, event, handles));
+              'Callback', @(src, event) run_rpca(src, event, handles));
     
     uicontrol('Style', 'pushbutton', 'String', 'Save Result', ...
               'Position', [450, 350, 100, 30], ...
@@ -39,7 +39,7 @@ function load_image(~, ~, handles)
     end
 end
 
-function run_rpca_1(~, ~, handles)
+function run_rpca(~, ~, handles)
     handles = guidata(handles.ax1);
     if isempty(handles.img)
         errordlg('Please load an image first!', 'Error');
@@ -54,35 +54,6 @@ function run_rpca_1(~, ~, handles)
     for i = 1:c
         [handles.L(:,:,i), handles.S(:,:,i)] = rpca(handles.img(:,:,i), 10 * lambda);
     end
-    
-    imshow(handles.L, 'Parent', handles.ax2);
-    title(handles.ax2, 'Denoised Image');
-    
-    imshow(handles.S, 'Parent', handles.ax3);
-    title(handles.ax3, 'Noise Component');
-    
-    guidata(handles.ax1, handles);
-end
-
-function run_rpca_2(~, ~, handles)
-    handles = guidata(handles.ax1);
-    if isempty(handles.img)
-        errordlg('Please load an image first!', 'Error');
-        return;
-    end
-    [m, n, c] = size(handles.img);
-    lambda = 1 / max(m, n);
-    
-    handles.L = zeros(size(handles.img));
-    handles.S = zeros(size(handles.img));
-    A = zeros(size(handles.img));
-    
-    for i = 1:c
-        A = A .* 256;
-        A = A + handles.img(:,:,i);
-    end
-
-    [handles.L(:,:,i), handles.S(:,:,i)] = rpca(A, lambda);
     
     imshow(handles.L, 'Parent', handles.ax2);
     title(handles.ax2, 'Denoised Image');
@@ -161,7 +132,7 @@ function [L,S] = rpca(A, lambda)
         % 更新 mu
         mu = min(mu*rho, mu_bar);
     
-        % 显示每次迭代的信息（可选）
+        % 显示每次迭代的信息
         if mod(iter, 50) == 0
             fprintf('Iteration %d, error = %e\n', iter, err);
         end
@@ -170,4 +141,3 @@ function [L,S] = rpca(A, lambda)
     fprintf('算法迭代结束，共进行 %d 次迭代，最终误差 %e\n', iter, err);
 
 end
-
