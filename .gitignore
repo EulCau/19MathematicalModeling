@@ -1,6 +1,7 @@
 build/
 bin/
 libs/
+__pycache__/
 .vscode
 Tmp/
 .idea
