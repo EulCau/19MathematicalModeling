@@ -5,7 +5,7 @@ class InsectClassifier(nn.Module):
 		super(InsectClassifier, self).__init__()
 		if hidden_dims is None:
 			hidden_dims = [16, 32]
-		layers = []
+		layers: list[nn.Module] = []
 		dims = [input_dim] + hidden_dims
 
 		act_fn = {
