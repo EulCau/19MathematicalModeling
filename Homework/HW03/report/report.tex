@@ -1,0 +1,82 @@
+\documentclass{article}
+\usepackage[UTF8]{ctex}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{subcaption}
+\usepackage{geometry}
+\geometry{a4paper, left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm}
+
+\title{作业3实验报告: 基于神经网络的昆虫分类}
+\author{21 刘行}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{问题背景}
+在生物分类任务中, 自动化分类模型需要根据样本特征 (如昆虫的体长和翼长) 预测其类别. 本实验使用神经网络对两类数据集 (常规数据与含噪声数据) 进行分类, 通过对比不同参数配置下的分类准确率, 分析模型的鲁棒性与影响因素.
+
+\section{方法描述}
+\subsection{模型结构}
+采用全连接神经网络, 结构如下:
+\begin{itemize}
+    \item 输入层: 2个神经元 (对应体长和翼长) 
+    \item 隐藏层: 默认配置为$[16, 32, 64]$, 激活函数可选ReLU/Tanh/Sigmoid
+    \item 输出层: 3个神经元 (对应类别0/1/2) , 使用Softmax归一化
+\end{itemize}
+
+\subsection{损失函数与优化器}
+\begin{equation}
+    \mathcal{L} = \text{CrossEntropyLoss}, \quad \text{优化器: Adam (学习率 } 10^{-3}\text{)}
+\end{equation}
+
+\section{实验设置}
+\subsection{数据集说明}
+\begin{itemize}
+    \item 数据集1: 常规, 训练集 (\texttt{insects-training.txt}) 与测试集 (\texttt{insects-testing.txt})
+    \item 数据集2: 含噪声, 训练集 (\texttt{insects-2-training.txt}) 与测试集 (\texttt{insects-2-testing.txt})
+    \item 测试集分为两部分: 前60个为训练集子集, 后150个为全新数据
+\end{itemize}
+
+\subsection{训练参数}
+\begin{itemize}
+    \item 训练轮次: 100
+    \item 批大小: 32
+    \item 隐藏层维度: $[16, 32, 64]$
+    \item 激活函数: ReLU (默认) 
+\end{itemize}
+
+\section{实验结果}
+\subsection{分类准确率对比}
+\begin{table}[ht]
+    \centering
+    \caption{不同数据集下的测试准确率 (\%)}
+    \label{tab:acc}
+    \begin{tabular}{cccc}
+        \toprule
+        数据集 & 前 60 样本 & 后 150 样本 & 总体 \\
+        \midrule
+        数据集1 & 96.67 & 94.67 & 95.24 \\
+        数据集2 & 90.00 & 92.00 & 91.43 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsection{参数影响分析}
+\begin{itemize}
+    \item \textbf{隐藏层维度}: 增加层数 (如从$[16,32]$到$[16,32,64]$) 可提升复杂数据拟合能力, 但可能引发过拟合.
+    \item \textbf{激活函数}: ReLU在两类数据集上表现最优, Tanh次之, Sigmoid因梯度消失问题导致收敛缓慢.
+\end{itemize}
+
+\subsection{关键发现}
+\begin{itemize}
+    \item 测试集分割意义: 前 60 样本验证模型对训练数据的记忆能力, 后150样本评估泛化性能. 实验表明模型未严重过拟合 (后150准确率高于85\%).
+    \item 噪声影响: 数据集 2 中噪声使分类边界模糊, 导致后 150 样本准确率下降约 2.67\%.
+    \item 噪声可能导致前 60 个数据受污染情况更严重, 使得数据集 2 中前 60 样本测试结果反而小与后 150 样本.
+\end{itemize}
+
+\section{结论}
+本实验验证了全连接神经网络在昆虫分类任务中的有效性. 模型在常规数据上表现优异 (总体准确率95.24\%), 但对噪声敏感. 未来可通过数据增强或Dropout层提升鲁棒性.
+
+\end{document}
