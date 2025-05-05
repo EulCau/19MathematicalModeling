@@ -1,5 +1,14 @@
-im1 = imread('../data/NewBackGround.jpg');
-im2 = imread('../data/BearInWater.jpg');
+[dstFile, dstPath] = uigetfile({'*.png;*.jpg;*.bmp', '图像文件'}, '选择目标图像');
+if isequal(dstFile, 0)
+    error('未选择目标图像');
+end
+im1 = imread(fullfile(dstPath, dstFile));
+
+[srcFile, srcPath] = uigetfile({'*.png;*.jpg;*.bmp', '图像文件'}, '选择源图像');
+if isequal(srcFile, 0)
+    error('未选择源图像');
+end
+im2 = imread(fullfile(srcPath, srcFile));
 
 figure('Units', 'pixel', 'Position',...
     [100,100,1000,700], 'toolbar', 'none');
@@ -36,26 +45,24 @@ hToolShowROI = uipushtool(...
     'TooltipString', 'Show ROI polygon',...
     'ClickedCallback', @(src, evt) showROICB());
 
-hToolHideROI = uipushtool(...
-    'CData', reshape(repmat([0 0 1], 100, 1), [10 10 3]),...
-    'TooltipString', 'Show ROI polygon',...
-    'ClickedCallback', @(src, evt) hideROICB());
-
 hToolSave = uipushtool(...
     'CData', reshape(repmat([0 1 0], 100, 1), [10 10 3]),...
     'TooltipString', 'save blended image to file',...
     'ClickedCallback', @toolSaveCB);
 
 function showROICB()
-    hpolys = evalin('base', 'hpolys');
-    if length(hpolys) >= 2
-        set(hpolys(2), 'Visible', 'on');
+    persistent showed
+    if isempty(showed)
+        showed = true;
     end
-end
-
-function hideROICB()
     hpolys = evalin('base', 'hpolys');
     if length(hpolys) >= 2
-        set(hpolys(2), 'Visible', 'off');
+        if showed
+            set(hpolys(2), 'Visible', 'off');
+            showed = false;
+        else
+            set(hpolys(2), 'Visible', 'on');
+            showed = true;
+        end
     end
 end
