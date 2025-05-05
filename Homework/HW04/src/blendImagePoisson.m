@@ -49,7 +49,6 @@ function imdst = blendImagePoisson(im1, im2, roi, target, mixing)
         [L, U, P, Q, R] = lu(A);  % 预分解
         cachedNumPix = numPix;
     end
-    % -----------------------------------------------------
 
     % 计算 target 中的对应位置偏移
     offset = round(target(1,:) - roi(1,:));
@@ -63,6 +62,8 @@ function imdst = blendImagePoisson(im1, im2, roi, target, mixing)
         b = zeros(numPix, 1);
         src = double(src_crop(:,:,c));
         dst = double(dst_int(:,:,c));
+
+        % 组装右侧向量
         for k = 1:numPix
             i = Y(k); j = X(k);
             grad_div = 0;
