@@ -1,3 +1,6 @@
 [submodule "USTC_MM_25"]
 	path = USTC_MM_25
 	url = https://github.com/TheVaticanCameos/USTC_MM_25
+[submodule "Homework/FinalProject"]
+	path = Homework/FinalProject
+	url = https://github.com/EulCau/23Final_MM
